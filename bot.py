@@ -46,7 +46,8 @@ logger = logging.getLogger(__name__)
 db = Database()
 
 ADMIN_IDS = [int(x.strip()) for x in os.getenv("ADMIN_IDS", "").split(",") if x.strip().isdigit()]
-WEBHOOK_URL = os.getenv("WEBHOOK_URL", os.getenv("RENDER_EXTERNAL_URL", "")).strip()
+_disable_webhook = os.getenv("DISABLE_WEBHOOK", "0").strip().lower() in ("1", "true", "yes", "on")
+WEBHOOK_URL = "" if _disable_webhook else os.getenv("WEBHOOK_URL", os.getenv("RENDER_EXTERNAL_URL", "")).strip()
 WEBHOOK_PORT = int(os.getenv("PORT", os.getenv("WEBHOOK_PORT", "8443")))
 WEBHOOK_PATH = os.getenv("WEBHOOK_PATH", "/tg-webhook").strip().strip("/") or "tg-webhook"
 MINI_APP_URL = os.getenv("MINI_APP_URL", "").strip()
