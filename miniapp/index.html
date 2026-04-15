@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>Qarz panel</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; background: var(--tg-theme-bg-color,#0d1117); color: var(--tg-theme-text-color,#e6edf3); margin: 0; padding: 16px; }
+    h1 { font-size: 1.1rem; margin: 0 0 12px; }
+    p { opacity: .85; line-height: 1.45; font-size: 14px; }
+    .card { background: var(--tg-theme-secondary-bg-color,#161b22); border-radius: 12px; padding: 14px; margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <h1>🏦 Qarz Hisobchi</h1>
+  <p>Bu mini-panel. Asosiy amallar chatdagi tugmalar va <code>/panel</code> orqali.</p>
+  <div class="card">
+    <p id="u"></p>
+  </div>
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+    const u = tg.initDataUnsafe && tg.initDataUnsafe.user;
+    document.getElementById('u').textContent = u
+      ? ('Foydalanuvchi: ' + (u.first_name || '') + ' (@' + (u.username || '') + ')')
+      : 'Telegram maʼlumoti yo‘q.';
+  </script>
+</body>
+</html>
