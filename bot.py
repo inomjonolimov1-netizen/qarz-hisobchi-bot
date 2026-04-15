@@ -1928,6 +1928,9 @@ async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> N
 
 
 async def post_init(application: Application) -> None:
+    if _disable_webhook:
+        # Polling mode requires webhook to be disabled on Telegram side.
+        await application.bot.delete_webhook(drop_pending_updates=True)
     cmds = [
         BotCommand("start", "Boshlash"),
         BotCommand("panel", "Tezkor panel"),
