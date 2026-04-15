@@ -7,6 +7,8 @@
 ╚══════════════════════════════════════════════╝
 """
 import logging, re, os, random, io, tempfile, json
+import threading
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from datetime import datetime, time as timeofday
 from dotenv import load_dotenv
 load_dotenv()
@@ -51,6 +53,42 @@ WEBHOOK_URL = "" if _disable_webhook else os.getenv("WEBHOOK_URL", os.getenv("RE
 WEBHOOK_PORT = int(os.getenv("PORT", os.getenv("WEBHOOK_PORT", "8443")))
 WEBHOOK_PATH = os.getenv("WEBHOOK_PATH", "/tg-webhook").strip().strip("/") or "tg-webhook"
 MINI_APP_URL = os.getenv("MINI_APP_URL", "").strip()
+
+
+class _HealthHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header("Content-Type", "text/plain; charset=utf-8")
+        self.end_headers()
+        self.wfile.write(b"ok")
+
+    def log_message(self, format, *args):
+        # Health checks are frequent; keep logs clean.
+        return
+
+
+def _start_health_server_if_needed():
+    """
+    Render Web Service expects an open port.
+    When webhook is disabled (polling mode), start a tiny health server.
+    """
+    if not _disable_webhook:
+        return
+    port_raw = os.getenv("PORT", "").strip()
+    if not port_raw.isdigit():
+        return
+    port = int(port_raw)
+
+    def _run():
+        try:
+            server = HTTPServer(("0.0.0.0", port), _HealthHandler)
+            logger.info("Health server started on port %s (polling mode)", port)
+            server.serve_forever()
+        except Exception as e:
+            logger.warning("Health server start failed: %s", e)
+
+    t = threading.Thread(target=_run, daemon=True)
+    t.start()
 
 
 def L(update: Update, key: str, **kwargs) -> str:
@@ -1917,6 +1955,7 @@ async def post_init(application: Application) -> None:
 #  MAIN
 # ══════════════════════════════════════════════════════════════════════════════
 def main():
+    _start_health_server_if_needed()
     app = Application.builder().token(BOT_TOKEN).post_init(post_init).build()
 
     wizard = ConversationHandler(
