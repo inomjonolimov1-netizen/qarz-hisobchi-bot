@@ -225,7 +225,7 @@ MAIN_KB = ReplyKeyboardMarkup([
     [KeyboardButton("📋 Ro'yxat"),          KeyboardButton("📊 Statistika")],
     [KeyboardButton("📈 Hisobot"),          KeyboardButton("📥 Excel")],
     [KeyboardButton("🔍 Qidirish"),         KeyboardButton("❓ Yordam")],
-], resize_keyboard=True, is_persistent=True)
+], resize_keyboard=True)
 
 CANCEL_KB = ReplyKeyboardMarkup(
     [[KeyboardButton("🔙 Bekor qilish")]],
@@ -1810,6 +1810,7 @@ async def cmd_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def cmd_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("⌨️ Klaviatura yangilanmoqda...", reply_markup=ReplyKeyboardRemove())
     await update.message.reply_text(
         "📱 Menyu qayta chiqarildi. Pastdagi tugmalardan foydalaning.",
         reply_markup=MAIN_KB
