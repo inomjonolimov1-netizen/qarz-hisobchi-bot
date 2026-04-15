@@ -1110,7 +1110,13 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     # ── GURUH/SHAXSIY: qarz/to'lov matnini tahlil qilish ─────────────────────
-    await do_process(update, text, cid, grp)
+    processed = await do_process(update, text, cid, grp)
+    if not processed and not grp:
+        # Mobile Telegram may hide keyboard; resend menu on unknown input.
+        await update.message.reply_text(
+            "ℹ️ Tushunmadim. Pastdagi menyudan tanlang yoki /menu yuboring.",
+            reply_markup=MAIN_KB
+        )
 
 
 def _panel_text(chat_id: int) -> str:
@@ -1803,6 +1809,13 @@ async def cmd_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(txt, parse_mode='HTML', reply_markup=MAIN_KB)
 
 
+async def cmd_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(
+        "📱 Menyu qayta chiqarildi. Pastdagi tugmalardan foydalaning.",
+        reply_markup=MAIN_KB
+    )
+
+
 # ══════════════════════════════════════════════════════════════════════════════
 #  OVOZLI XABAR
 # ══════════════════════════════════════════════════════════════════════════════
@@ -1944,6 +1957,7 @@ async def post_init(application: Application) -> None:
         BotCommand("bonus", "Muddatdan oldin bonus %"),
         BotCommand("kurs", "Valyuta kurslari"),
         BotCommand("backup", "Zaxira nusxa"),
+        BotCommand("menu", "Menyuni qayta ko'rsatish"),
     ]
     await application.bot.set_my_commands(cmds)
     if MINI_APP_URL:
@@ -1996,6 +2010,7 @@ def main():
     app.add_handler(CommandHandler("import",  cmd_import))
     app.add_handler(CommandHandler("yordam",  cmd_help))
     app.add_handler(CommandHandler("help",    cmd_help))
+    app.add_handler(CommandHandler("menu",    cmd_menu))
     app.add_handler(CommandHandler("panel",   cmd_panel))
     app.add_handler(CommandHandler("audit",   cmd_audit))
     app.add_handler(CommandHandler("eslatmakun", cmd_eslatmakun))
