@@ -12,3 +12,12 @@ services:
         sync: false
       - key: WEBHOOK_PATH
         value: tg-webhook
+services:
+  - type: web
+    name: qarz-hisobchi-bot
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python main.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
