@@ -45,6 +45,9 @@ logging.basicConfig(
     ]
 )
 logger = logging.getLogger(__name__)
+# Prevent access token leakage in request logs (httpx prints full URLs on INFO).
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("httpcore").setLevel(logging.WARNING)
 db = Database()
 
 ADMIN_IDS = [int(x.strip()) for x in os.getenv("ADMIN_IDS", "").split(",") if x.strip().isdigit()]
